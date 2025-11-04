@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CrossIcon } from './Icons';
+import { setModelApiKey } from '../services/geminiService';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
   const handleSave = () => {
     // Functionality not required for this task.
-    console.log("Saving settings:", { apiKey });
+    setModelApiKey(apiKey);
     onClose();
   };
 

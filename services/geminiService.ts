@@ -7,7 +7,15 @@ if (!process.env.API_KEY) {
   console.warn("API_KEY environment variable not set. Using a placeholder.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "API_KEY_PLACEHOLDER" });
+// const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "API_KEY_PLACEHOLDER" });
+let ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "API_KEY_PLACEHOLDER" });
+
+console.log("ai:", ai);
+
+export const setModelApiKey = (apiKey: string) => {
+  ai = new GoogleGenAI({ apiKey });
+  console.log("API key updated in geminiService.");
+}
 
 const cleanJsonString = (str: string): string => {
   // Attempts to remove markdown backticks and "json" label
