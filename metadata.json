@@ -1,0 +1,5 @@
+{
+  "name": "MERLIN: Metamorphic Relation Identifier",
+  "description": "A prototype system to identify metamorphic relations, generate test drivers, and manage them using a large language model. It features a conversational interface for multi-turn interaction and persists session data.",
+  "requestFramePermissions": []
+}
