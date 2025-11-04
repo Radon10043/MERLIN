@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CrossIcon } from './Icons';
-import { setModelApiKey } from '../services/geminiService';
+import { setupModel } from '../services/geminiService';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface SettingsModalProps {
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [apiKey, setApiKey] = useState('');
+  const [baseUrl, setBaseUrl] = useState('');
 
   if (!isOpen) {
     return null;
@@ -16,7 +17,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
 
   const handleSave = () => {
     // Functionality not required for this task.
-    setModelApiKey(apiKey);
+    setupModel(baseUrl, apiKey);
     onClose();
   };
 
@@ -50,6 +51,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
               onChange={(e) => setApiKey(e.target.value)}
               className="bg-gray-700 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition"
               placeholder="Enter your API Key"
+            />
+          </div>
+          <div className="flex flex-col space-y-2">
+            <label htmlFor="baseUrl" className="text-sm font-medium text-gray-400">Base URL</label>
+            <input
+              id="baseUrl"
+              type="text"
+              value={baseUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
+              className="bg-gray-700 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition"
+              placeholder="e.g., https://api.openai.com/v1"
             />
           </div>
         </div>
