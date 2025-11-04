@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { DeleteIcon, UploadIcon, FileIcon, CrossIcon, ExportIcon, ImportIcon, SettingsIcon, EditIcon } from './Icons';
 import { UploadedCodeFile, MetamorphicRelation } from '../types';
 
@@ -20,6 +20,19 @@ interface ConfigurationPanelProps {
   onOpenPromptModal: () => void;
 }
 
+const SectionChevronDown = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+);
+
+const SectionChevronUp = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+    </svg>
+);
+
+
 const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   modelName,
   setModelName,
@@ -40,6 +53,9 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   const specFileInputRef = useRef<HTMLInputElement>(null);
   const demoFileInputRef = useRef<HTMLInputElement>(null);
   const importMRsInputRef = useRef<HTMLInputElement>(null);
+  const [isConfigOpen, setIsConfigOpen] = useState(true);
+  const [isContextOpen, setIsContextOpen] = useState(true);
+  const [isManageDataOpen, setIsManageDataOpen] = useState(true);
 
   const handleSingleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -91,10 +107,18 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
   );
 
   return (
-    <aside className="w-80 bg-gray-950/50 p-4 flex flex-col space-y-6 border-r border-gray-700/50 overflow-y-auto">
-      <div>
-        <h2 className="text-xl font-semibold text-cyan-300 border-b border-cyan-700/50 pb-2 mb-6">Configuration</h2>
-        <div className="space-y-4">
+    <aside className="w-80 bg-gray-950/50 p-4 flex flex-col border-r border-gray-700/50 overflow-y-auto">
+      <div className="mb-6">
+        <button
+          onClick={() => setIsConfigOpen(!isConfigOpen)}
+          className="w-full flex justify-between items-center text-xl font-semibold text-cyan-300 border-b border-cyan-700/50 pb-2"
+        >
+          <span>Configuration</span>
+          {isConfigOpen ? <SectionChevronUp /> : <SectionChevronDown />}
+        </button>
+
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isConfigOpen ? 'max-h-[1000px]' : 'max-h-0'}`}>
+          <div className="space-y-4 pt-4">
             <div className="flex flex-col space-y-2">
                 <label htmlFor="modelName" className="text-sm font-medium text-gray-400">Model Name</label>
                 <input
@@ -103,7 +127,7 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                 value={modelName}
                 onChange={(e) => setModelName(e.target.value)}
                 className="bg-gray-800 border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition"
-                placeholder="e.g., gemini-2.5-flash"
+                placeholder="e.g., gpt-4-turbo"
                 />
             </div>
 
@@ -143,81 +167,102 @@ const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({
                     View / Edit Prompt
                 </button>
             </div>
+          </div>
         </div>
       </div>
       
-      <div className="flex-grow flex flex-col min-h-0 space-y-4 pt-4 border-t border-gray-700/50">
-        <h3 className="text-lg font-semibold text-cyan-300">Context Augmentation</h3>
+      <div className="pt-4 border-t border-gray-700/50 mb-6">
+        <button
+            onClick={() => setIsContextOpen(!isContextOpen)}
+            className="w-full flex justify-between items-center text-lg font-semibold text-cyan-300"
+        >
+          <span>Context Augmentation</span>
+          {isContextOpen ? <SectionChevronUp /> : <SectionChevronDown />}
+        </button>
         
-        {/* Specification Upload */}
-        <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-400">Specification</label>
-            <input type="file" ref={specFileInputRef} onChange={(e) => handleSingleFileChange(e, setSpecificationFile)} className="hidden" />
-            {!specificationFile ? (
-                 <button onClick={() => specFileInputRef.current?.click()} className="flex items-center justify-center gap-2 w-full bg-cyan-800/50 hover:bg-cyan-700/50 text-cyan-200 font-semibold py-2 px-4 rounded-md transition duration-200">
-                    <UploadIcon /> Upload Specification
-                </button>
-            ) : (
-                <SingleFileDisplay file={specificationFile} onRemove={() => setSpecificationFile(null)} />
-            )}
-        </div>
-        
-        {/* Demo Upload */}
-        <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-400">Demo</label>
-            <input type="file" ref={demoFileInputRef} onChange={(e) => handleSingleFileChange(e, setDemoFile)} className="hidden" />
-            {!demoFile ? (
-                 <button onClick={() => demoFileInputRef.current?.click()} className="flex items-center justify-center gap-2 w-full bg-cyan-800/50 hover:bg-cyan-700/50 text-cyan-200 font-semibold py-2 px-4 rounded-md transition duration-200">
-                    <UploadIcon /> Upload Demo File
-                </button>
-            ) : (
-                <SingleFileDisplay file={demoFile} onRemove={() => setDemoFile(null)} />
-            )}
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isContextOpen ? 'max-h-[1000px]' : 'max-h-0'}`}>
+            <div className="space-y-4 pt-4">
+                {/* Specification Upload */}
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-400">Specification</label>
+                    <input type="file" ref={specFileInputRef} onChange={(e) => handleSingleFileChange(e, setSpecificationFile)} className="hidden" />
+                    {!specificationFile ? (
+                         <button onClick={() => specFileInputRef.current?.click()} className="flex items-center justify-center gap-2 w-full bg-cyan-800/50 hover:bg-cyan-700/50 text-cyan-200 font-semibold py-2 px-4 rounded-md transition duration-200">
+                            <UploadIcon /> Upload Specification
+                        </button>
+                    ) : (
+                        <SingleFileDisplay file={specificationFile} onRemove={() => setSpecificationFile(null)} />
+                    )}
+                </div>
+                
+                {/* Demo Upload */}
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-400">Demo</label>
+                    <input type="file" ref={demoFileInputRef} onChange={(e) => handleSingleFileChange(e, setDemoFile)} className="hidden" />
+                    {!demoFile ? (
+                         <button onClick={() => demoFileInputRef.current?.click()} className="flex items-center justify-center gap-2 w-full bg-cyan-800/50 hover:bg-cyan-700/50 text-cyan-200 font-semibold py-2 px-4 rounded-md transition duration-200">
+                            <UploadIcon /> Upload Demo File
+                        </button>
+                    ) : (
+                        <SingleFileDisplay file={demoFile} onRemove={() => setDemoFile(null)} />
+                    )}
+                </div>
+            </div>
         </div>
       </div>
 
-      <div className="flex flex-col space-y-2 pt-4 border-t border-gray-700/50 mt-auto">
-        <h3 className="text-lg font-semibold text-cyan-300">Manage Data</h3>
-        
-        <input type="file" accept=".json" ref={importMRsInputRef} onChange={onImportMRs} className="hidden" />
+      <div className="pt-4 border-t border-gray-700/50">
         <button
-            onClick={() => importMRsInputRef.current?.click()}
-            className="flex items-center justify-center gap-2 w-full bg-blue-800/50 hover:bg-blue-700/50 text-blue-200 font-semibold py-2 px-4 rounded-md transition duration-200"
+          onClick={() => setIsManageDataOpen(!isManageDataOpen)}
+          className="w-full flex justify-between items-center text-lg font-semibold text-cyan-300"
         >
-            <ImportIcon />
-            Import MRs
+          <span>Manage Data</span>
+          {isManageDataOpen ? <SectionChevronUp /> : <SectionChevronDown />}
         </button>
 
-        <button
-            onClick={handleExport}
-            className="flex items-center justify-center gap-2 w-full bg-purple-800/50 hover:bg-purple-700/50 text-purple-200 font-semibold py-2 px-4 rounded-md transition duration-200"
-        >
-            <ExportIcon />
-            Export MRs
-        </button>
-        
-        <div className="pt-2 flex flex-col space-y-2">
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isManageDataOpen ? 'max-h-[1000px]' : 'max-h-0'}`}>
+          <div className="flex flex-col space-y-2 pt-4">
+            <input type="file" accept=".json" ref={importMRsInputRef} onChange={onImportMRs} className="hidden" />
             <button
-                onClick={onOpenSettings}
-                className="flex items-center justify-center gap-2 w-full bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 font-semibold py-2 px-4 rounded-md transition duration-200"
+                onClick={() => importMRsInputRef.current?.click()}
+                className="flex items-center justify-center gap-2 w-full bg-blue-800/50 hover:bg-blue-700/50 text-blue-200 font-semibold py-2 px-4 rounded-md transition duration-200"
             >
-                <SettingsIcon />
-                Settings
+                <ImportIcon />
+                Import MRs
             </button>
+
             <button
-                onClick={clearChatHistory}
-                className="flex items-center justify-center gap-2 w-full bg-red-800/50 hover:bg-red-700/50 text-red-200 font-semibold py-2 px-4 rounded-md transition duration-200"
+                onClick={handleExport}
+                className="flex items-center justify-center gap-2 w-full bg-purple-800/50 hover:bg-purple-700/50 text-purple-200 font-semibold py-2 px-4 rounded-md transition duration-200"
             >
-                <DeleteIcon />
-                Clear Chat History
+                <ExportIcon />
+                Export MRs
             </button>
-            <button
-                onClick={clearMRs}
-                className="flex items-center justify-center gap-2 w-full bg-red-800/50 hover:bg-red-700/50 text-red-200 font-semibold py-2 px-4 rounded-md transition duration-200"
-            >
-                <DeleteIcon />
-                Clear MRs
-            </button>
+            
+            <div className="pt-2 flex flex-col space-y-2">
+                <button
+                    onClick={onOpenSettings}
+                    className="flex items-center justify-center gap-2 w-full bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 font-semibold py-2 px-4 rounded-md transition duration-200"
+                >
+                    <SettingsIcon />
+                    Settings
+                </button>
+                <button
+                    onClick={clearChatHistory}
+                    className="flex items-center justify-center gap-2 w-full bg-red-800/50 hover:bg-red-700/50 text-red-200 font-semibold py-2 px-4 rounded-md transition duration-200"
+                >
+                    <DeleteIcon />
+                    Clear Chat History
+                </button>
+                <button
+                    onClick={clearMRs}
+                    className="flex items-center justify-center gap-2 w-full bg-red-800/50 hover:bg-red-700/50 text-red-200 font-semibold py-2 px-4 rounded-md transition duration-200"
+                >
+                    <DeleteIcon />
+                    Clear MRs
+                </button>
+            </div>
+          </div>
         </div>
       </div>
     </aside>
